@@ -3,8 +3,6 @@ import { EditorView, basicSetup } from 'codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { autocompletion } from '@codemirror/autocomplete';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { MazeConfig } from './core/maze.config';
-import { MazeScreen } from './core/maze.screen';
 import { MazeInitializer } from './core/maze-initializer';
 import { MovementDirection } from './core/movement-direction.enum';
 import { SpeedEnum } from './core/speed.enum';
@@ -30,7 +28,6 @@ const editor = new EditorView({
   extensions: [basicSetup, javascript(), autocompletion(), oneDark],
   parent: document.getElementById('codeEditor')!
 });
-let gameRunning = false;
 
 
 const btnPlay = document.getElementById('btnPlay')!;
@@ -46,7 +43,6 @@ const onClickPlay = () => {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, SpeedEnum.SLOW);
   game.afterEndListener((solved: boolean) => {
-    gameRunning = false;
     btnPlay.removeAttribute('disabled');
     btnSubmit.removeAttribute('disabled');
     const newCanvas = document.createElement('canvas');
@@ -68,7 +64,6 @@ const onClickPlay = () => {
   btnPlay.setAttribute('disabled', 'true');
   btnSubmit.setAttribute('disabled', 'true');
   game.start();
-  gameRunning = true;
   userFunction(game, MovementDirection);
 };
 

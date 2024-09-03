@@ -4,9 +4,9 @@ import { MazeConfig } from "./maze.config";
 export class MazeScreen {
     public static CELL_SIZE: number = 25;
     private static MARGIN_TOP: number = 0;
-    private static MARGIN_BOTTOM: number = 0;
+    // private static MARGIN_BOTTOM: number = 0;
     private static MARGIN_LEFT: number = 0;
-    private static MARGIN_RIGTH: number = 0;
+    // private static MARGIN_RIGTH: number = 0;
     private height: number = 0;
     private width: number = 0;
     private config: MazeConfig | null = null;
@@ -44,8 +44,8 @@ export class MazeScreen {
     // }
 
     private printOnCell(x: number, y: number, c: string): void {
-        const num1: number = this.mazeInfo.movements();
-        const num2: number = this.mazeInfo.time();
+        // const num1: number = this.mazeInfo.movements();
+        // const num2: number = this.mazeInfo.time();
         const permutedY = (this.config!.width()-1)-x>=0?(this.config!.width()-1)-x:(this.config!.width()-1)-x+this.config!.width()-1
         const permutedX = y-(this.config!.height()-1)>0?y-(this.config!.height()-1):y-(this.config!.height()-1)+this.config!.height()-1
         const centerX = (permutedX + 0.5) * MazeScreen.CELL_SIZE + MazeScreen.MARGIN_LEFT;
@@ -53,9 +53,6 @@ export class MazeScreen {
         
         // Calcular el radio del círculo, ajustado por la escala
         const radius = MazeScreen.CELL_SIZE * 0.27; // Ajustar el 0.4 para cambiar el tamaño del círculo
-
-        const permutedCenterX = (x + 0.5) * MazeScreen.CELL_SIZE + MazeScreen.MARGIN_LEFT;
-        const permutedCenterY = this.canvas.height - (y + 0.5) * MazeScreen.CELL_SIZE - MazeScreen.MARGIN_TOP;
 
         // Dibujar el círculo
         this.ctx.beginPath();
