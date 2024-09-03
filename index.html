@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div id="app">
+      <section class="code-section">
+        <div id="codeEditor"></div>
+        <div class="tool-bar">
+          <button type="button" id="btnPlay">Play</button>
+          <button type="button" id="btnSubmit">Enviar</button>
+        </div>
+      </section>
+      <section class="maze-section">
+        <div class="tool-bar">
+          <select id="cbMaze">
+            <option value="Test01">Laberinto 1</option>
+            <option value="Test02">Laberinto 2</option>
+            <option value="Test03">Laberinto 3</option>
+            <option value="Test04">Laberinto 4</option>
+            <option value="Test05">Laberinto 5</option>
+          </select>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+      </section>
+      
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
