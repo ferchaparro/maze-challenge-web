@@ -160,7 +160,7 @@ export class MazeImpl implements Maze, MazeInfo {
         }
         // this._screen?.deletePosition();
         const m: number = ++this._movements;
-        const t: number = (this._timer?.getElapsedTime()??0)/1000;
+        // const t: number = (this._timer?.getElapsedTime()??0)/1000;
         switch (dir)
         {
         case MovementDirection.SOUTH:
