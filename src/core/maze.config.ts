@@ -16,7 +16,7 @@ export class MazeConfig {
     async loadConfig( fileConfig: string) {
         try {
             const fileLoaded = await fetch(`/mazes/${fileConfig}`).then(res => res.text());
-            const lines = fileLoaded.split('\r\n')
+            const lines = fileLoaded.split(/\r?\n/)
             let strArray1 = lines[0].split(this.separator);
             this.mazeWidth = parseInt(strArray1[0]);
             this.mazeHeight = parseInt(strArray1[1]);
