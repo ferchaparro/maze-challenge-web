@@ -34,6 +34,23 @@ const btnPlay = document.getElementById('btnPlay')!;
 const btnSubmit = document.getElementById('btnSubmit')!;
 const cbMaze = document.getElementById('cbMaze')! as HTMLSelectElement;
 
+const onEndGame = (solved: boolean) => {
+  btnPlay.removeAttribute('disabled');
+  btnSubmit.removeAttribute('disabled');
+  const newCanvas = document.createElement('canvas');
+  
+  newCanvas.id = 'gameCanvas';
+  
+  // Reemplazar el viejo canvas
+  canvas.parentNode?.replaceChild(newCanvas, canvas);
+  
+  if (solved){
+    alert('Maze solved!');
+  } else {
+    alert('Maze not solved!');
+  }
+};
+
 const onClickPlay = () => {
   const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
   solveMaze(game, MovementDirection)`);
@@ -42,22 +59,7 @@ const onClickPlay = () => {
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, SpeedEnum.SLOW);
-  game.afterEndListener((solved: boolean) => {
-    btnPlay.removeAttribute('disabled');
-    btnSubmit.removeAttribute('disabled');
-    const newCanvas = document.createElement('canvas');
-
-    newCanvas.id = 'gameCanvas';
-
-    // Reemplazar el viejo canvas
-    canvas.parentNode?.replaceChild(newCanvas, canvas);
-
-    if (solved){
-      alert('Maze solved!');
-    } else {
-      alert('Maze not solved!');
-    }
-  });
+  game.afterEndListener(onEndGame);
   game.afterMoveListener((step) => {
     console.log(`Step: ${step}`);
   });
@@ -65,6 +67,7 @@ const onClickPlay = () => {
   btnSubmit.setAttribute('disabled', 'true');
   game.start();
   userFunction(game, MovementDirection);
+  onEndGame(false);
 };
 
 const onClickSubmit = async () => {
@@ -86,7 +89,7 @@ const onClickSubmit = async () => {
     doneMaze9: true,
     doneMaze10: true
   };
-  const res = await fetch('https://game.justapgame.com/v1/maze/send', {
+  const res = await fetch('https://peentei.com:8085/api/v1/maze/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
