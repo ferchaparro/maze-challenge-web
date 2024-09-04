@@ -107,7 +107,7 @@ const onClickPlay = async () => {
   canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, onMove, onEndGame, SpeedEnum[cbSpeed.value as keyof typeof SpeedEnum]);
+  const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, onMove, onEndGame, SpeedEnum[cbSpeed.value]);
   btnPlay.setAttribute('disabled', 'true');
   btnSubmit.setAttribute('disabled', 'true');
   await game.start();
