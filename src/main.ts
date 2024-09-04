@@ -89,7 +89,7 @@ const onClickSubmit = async () => {
     doneMaze9: true,
     doneMaze10: true
   };
-  const res = await fetch('http://peentei.com:8085/api/v1/maze/send', {
+  const res = await fetch('https://justap.peentei.com/v1/maze/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
