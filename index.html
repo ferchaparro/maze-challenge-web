@@ -7,6 +7,7 @@
     <title>Vite + TS</title>
   </head>
   <body>
+    <div id="confeti-container"></div>
     <div id="app">
       <section class="code-section">
         <div id="codeEditor"></div>
@@ -17,6 +18,10 @@
       </section>
       <section class="maze-section">
         <div class="tool-bar">
+          <select id="cbSpeed">
+            <option value="SLOW">Lento</option>
+            <option value="FAST">R&aacute;pido</option>
+          </select>
           <select id="cbMaze">
             <option value="Test01">Laberinto 1</option>
             <option value="Test02">Laberinto 2</option>
@@ -26,6 +31,7 @@
           </select>
         </div>
         <canvas id="gameCanvas"></canvas>
+        <h3 id="lbMovements">Movimientos: 0</h3>
       </section>
       
     </div>

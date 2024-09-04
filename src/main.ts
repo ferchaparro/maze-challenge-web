@@ -7,10 +7,11 @@ import { MazeInitializer } from './core/maze-initializer';
 import { MovementDirection } from './core/movement-direction.enum';
 import { SpeedEnum } from './core/speed.enum';
 import { SendSolution } from './model/send-solution.model';
+import { Confeti } from './core/confeti';
 
 const editor = new EditorView({
   doc: `async function solveMaze(game, MovementDirection) {
-  // Aqui va tu codigo
+  // Aqui va tu codigo... recuerdas el codigo konami?
   await game.move(MovementDirection.NORTH)
   await game.move(MovementDirection.NORTH)
   await game.move(MovementDirection.NORTH)
@@ -29,13 +30,26 @@ const editor = new EditorView({
   parent: document.getElementById('codeEditor')!
 });
 
+let isDone = false;
 let canvas: HTMLCanvasElement;
 
 const btnPlay = document.getElementById('btnPlay')!;
 const btnSubmit = document.getElementById('btnSubmit')!;
 const cbMaze = document.getElementById('cbMaze')! as HTMLSelectElement;
+const cbSpeed = document.getElementById('cbSpeed')! as HTMLSelectElement;
+const lbMovements = document.getElementById('lbMovements')! as HTMLTitleElement;
 
+const confetiContainer = document.getElementById('confeti-container')!;
+const confeti = new Confeti(confetiContainer);
+const setMovements = (step: number) => {
+  lbMovements.innerText =`Movimientos: ${step}`;
+}
+
+const onMove = (step: number) => {
+  setMovements(step);
+}
 const onEndGame = (solved: boolean) => {
+  if (isDone) return;
   btnPlay.removeAttribute('disabled');
   btnSubmit.removeAttribute('disabled');
   const newCanvas = document.createElement('canvas');
@@ -45,29 +59,59 @@ const onEndGame = (solved: boolean) => {
   // Reemplazar el viejo canvas
   canvas.parentNode?.replaceChild(newCanvas, canvas);
   
-  if (solved){
+  if(solved){
+    isDone = true;
     alert('Maze solved!');
+    confeti.createConfetiExplosion();
   } else {
     alert('Maze not solved!');
   }
+  setMovements(0);
 };
 
-const onClickPlay = () => {
-  const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
-  solveMaze(game, MovementDirection);onEndGame(false);`);
+const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+let konamiIndex = 0;
+let codeActive = false;
+
+document.addEventListener('keydown', (event) => {
+    if (event.keyCode === konamiCode[konamiIndex]) {
+        konamiIndex++;
+        if (konamiIndex === konamiCode.length) {
+            triggerKonamiCode();
+            konamiIndex = 0; // Reiniciar para permitir múltiples usos
+        }
+    } else {
+        konamiIndex = 0; // Reiniciar si la tecla no coincide
+    }
+});
+
+function triggerKonamiCode() {
+    if(!codeActive) {
+      alert("¡Desbloqueaste algo!");
+      confeti.createConfetiExplosion();
+      cbMaze.appendChild(new Option('Bonus 1', 'extra01'));
+      cbMaze.appendChild(new Option('Bonus 2', 'extra02'));
+      cbMaze.appendChild(new Option('Bonus 3', 'extra03'));
+      codeActive = true;
+    } else {
+        alert("¡Ya lo usaste!, pero toma mas confeti");
+        confeti.createConfetiExplosion();
+    }
+}
+
+const onClickPlay = async () => {
+  isDone = false;
+  const userFunction = new Function('game', 'MovementDirection', 'onEndGame', `${editor.state.doc.toString()}
+  solveMaze(game, MovementDirection)`);
 
   canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, SpeedEnum.SLOW);
-  game.afterEndListener(onEndGame);
-  game.afterMoveListener((step) => {
-    console.log(`Step: ${step}`);
-  });
+  const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, onMove, onEndGame, SpeedEnum[cbSpeed.value as keyof typeof SpeedEnum]);
   btnPlay.setAttribute('disabled', 'true');
   btnSubmit.setAttribute('disabled', 'true');
-  game.start();
-  userFunction(game, MovementDirection);
+  await game.start();
+  userFunction(game, MovementDirection, onEndGame);
 };
 
 const onClickSubmit = async () => {

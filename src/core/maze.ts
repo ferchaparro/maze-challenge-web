@@ -1,15 +1,12 @@
 import { MovementDirection } from "./movement-direction.enum";
 
 export interface Maze {
-    start(): number;
+    start(): Promise<number>;
 
     watchLocation(): number;
 
-    end(): boolean;
+    isDone(): boolean;
 
     move(dir: MovementDirection): Promise<number>;
 
-    afterMoveListener(callback: (step: number) => void): void;
-
-    afterEndListener(callback: (solved: boolean) => void): void;
 }

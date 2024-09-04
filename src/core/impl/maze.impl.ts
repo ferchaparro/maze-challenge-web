@@ -18,11 +18,11 @@ export class MazeImpl implements Maze, MazeInfo {
     private _screen: MazeScreen|null = null;
     private _speed: number = 100;
     private _file: string = '';
-    private lastTime: number = 0;
-    private endListener: ((solved: boolean) => void) | null = null;
-    private moveListener: ((step: number) => void) | null = null;
+    private started: boolean = false;
 
-    constructor(file: string, private canvas: HTMLCanvasElement, private ctx: CanvasRenderingContext2D, speed: SpeedEnum = SpeedEnum.FAST) {
+    constructor(file: string, private canvas: HTMLCanvasElement, private ctx: CanvasRenderingContext2D,
+        private moveListener: (step: number) => void, private endListener: (solved: boolean) => void,
+        speed: SpeedEnum = SpeedEnum.FAST) {
       this._file = file;
       switch (speed) {
         case SpeedEnum.INSTANTLY: this._speed = 0; break;
@@ -32,22 +32,24 @@ export class MazeImpl implements Maze, MazeInfo {
       }
     }
 
-    afterEndListener(callback: (solved: boolean) => void): void {
-        this.endListener = callback;
-    };
-
-    afterMoveListener(callback: (step: number) => void): void {
-        this.moveListener = callback;
-    }
-
     refresh = async (x: number) => {
-        const currentTime: number = Math.floor(x) % this._speed;
         await Sleeper.sleep(this._speed)
-        if(currentTime < this.lastTime || true) {
-          this.lastTime = 0;
-          this._screen!.drawMaze(this._maze!);
-        }
-        this.lastTime = currentTime;
+        
+        const m: number = ++this._movements;
+        if(this.started) {
+            this._screen!.drawMaze(this._maze!);
+            this.moveListener(m);
+            if (this._movements >= this._max) {
+                await Sleeper.sleep(this._speed)
+                this.endListener(false);
+                this.started = false;
+                if (this._timer != null) {
+                    this._timer.stop();
+                }
+                this._screen?.printMaxMovementsMessage();
+                this._timer = null;
+            }
+        } 
         
         requestAnimationFrame(this.refresh);
     };
@@ -128,7 +130,7 @@ export class MazeImpl implements Maze, MazeInfo {
     movements(): number {
         return this._movements;
     }
-    start(): number {
+    async start(): Promise<number> {
         if (this._timer != null) {
             return -1;
         }
@@ -137,7 +139,9 @@ export class MazeImpl implements Maze, MazeInfo {
         this._x = this._maze!.iX();
         this._y = this._maze!.iY();
         this._movements = 0;
+        this.started = true;
         this.refresh(0);
+        await Sleeper.sleep(this._speed)
         
         // this._screen.printPosition();
         
@@ -148,18 +152,23 @@ export class MazeImpl implements Maze, MazeInfo {
     watchLocation(): number {
         return this._maze!.loc(this._x, this._y);
     }
-    end(): boolean {
+    isDone(): boolean {
+        if(this._movements >= this._max) {
+            throw new Error('Max movements reached');
+        }
         return this._x == this._maze!.fX() && this._y == this._maze!.fY();
     }
     async move(dir: MovementDirection): Promise<number> {
         if(this._timer == null) {
+            await Sleeper.sleep(this._speed)
             return -1;
         }
-        if ((dir & this._maze!.loc(this._x, this._y)) !=  0) {
+        if ((dir & this._maze!.loc(this._x, this._y)) !==  0) {
+            await Sleeper.sleep(this._speed)
             return -1;
         }
         // this._screen?.deletePosition();
-        const m: number = ++this._movements;
+        // const m: number = ++this._movements;
         // const t: number = (this._timer?.getElapsedTime()??0)/1000;
         switch (dir)
         {
@@ -177,21 +186,23 @@ export class MazeImpl implements Maze, MazeInfo {
             break;
         }
         // this.writeMovement(this._movements, this._x, this._y);
-        await Sleeper.sleep(this._speed+1);
+        await Sleeper.sleep(this._speed);
         this._screen?.printPosition();
-        if(this.moveListener){
-            this.moveListener(m);
-        }
+        // if(this.moveListener){
+        //     this.moveListener(m);
+        // }
         
         // Thread.Sleep(this._speed);
-        if (this.end())
+        if (this.isDone())
         {
             await Sleeper.sleep(10);
             if (this._timer != null) {
                 this._timer.stop();
             }
             if(this.endListener){
+                
                 this.endListener(true);
+                this.started = false;
             }
             this._screen?.printSuccessMessage();
             // new Thread((ThreadStart) (() => this.writeResult(m, t))).Start();
@@ -203,16 +214,17 @@ export class MazeImpl implements Maze, MazeInfo {
         }
         // this._x = this._maze!.fX();
         // this._y = this._maze!.fY();
-        if (this._timer != null) {
-            this._timer.stop();
-        }
-        if(this.endListener){
-            this.endListener(false);
-        }
-        this._screen?.printMaxMovementsMessage();
+        // if (this._timer != null) {
+        //     this._timer.stop();
+        // }
+        // // if(this.endListener){
+        // //     this.endListener(false);
+        // //     this.started = false;
+        // // }
+        // this._screen?.printMaxMovementsMessage();
       
-        // new Thread((ThreadStart) (() => this.writeResult(m, t))).Start();
-        this._timer = null;
+        // // new Thread((ThreadStart) (() => this.writeResult(m, t))).Start();
+        // this._timer = null;
         return 15;
     }
 

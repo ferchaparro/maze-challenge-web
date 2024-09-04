@@ -37,7 +37,7 @@ h1 {
 
 #app {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3fr 2fr;
   height: 100dvh;
   width: 100vw;
 }
@@ -66,6 +66,7 @@ h1 {
   max-height: calc(100% - 43px);
   width: 100%;
   overflow-y: auto;
+  overflow-x: visible;
   margin: 0;
   padding: 0;
 }
@@ -114,3 +115,42 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+#confeti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.confeti {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  opacity: 0.8;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  animation: explosion 1s ease-out forwards, fall 2s ease-in forwards;
+}
+
+@keyframes explosion {
+  from {
+      transform: translate(-50%, -50%) scale(1);
+  }
+  to {
+      transform: translate(var(--x), var(--y)) scale(1);
+  }
+}
+
+@keyframes fall {
+  to {
+      transform: translateY(100vh);
+  }
+}
