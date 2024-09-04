@@ -29,6 +29,7 @@ const editor = new EditorView({
   parent: document.getElementById('codeEditor')!
 });
 
+let canvas: HTMLCanvasElement;
 
 const btnPlay = document.getElementById('btnPlay')!;
 const btnSubmit = document.getElementById('btnSubmit')!;
@@ -55,7 +56,7 @@ const onClickPlay = () => {
   const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
   solveMaze(game, MovementDirection)`);
 
-  const canvas: HTMLCanvasElement = document.getElementById('gameCanvas')! as HTMLCanvasElement;
+  canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, SpeedEnum.SLOW);
