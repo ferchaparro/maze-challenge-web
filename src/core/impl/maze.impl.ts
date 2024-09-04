@@ -32,7 +32,7 @@ export class MazeImpl implements Maze, MazeInfo {
       }
     }
 
-    refresh = async (x: number) => {
+    refresh = async (_x: number) => {
         await Sleeper.sleep(this._speed)
         
         const m: number = ++this._movements;
