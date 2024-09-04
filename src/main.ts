@@ -54,7 +54,7 @@ const onEndGame = (solved: boolean) => {
 
 const onClickPlay = () => {
   const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
-  solveMaze(game, MovementDirection)`);
+  solveMaze(game, MovementDirection);onEndGame(false);`);
 
   canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
@@ -68,7 +68,6 @@ const onClickPlay = () => {
   btnSubmit.setAttribute('disabled', 'true');
   game.start();
   userFunction(game, MovementDirection);
-  onEndGame(false);
 };
 
 const onClickSubmit = async () => {
@@ -90,7 +89,7 @@ const onClickSubmit = async () => {
     doneMaze9: true,
     doneMaze10: true
   };
-  const res = await fetch('https://peentei.com:8085/api/v1/maze/send', {
+  const res = await fetch('http://peentei.com:8085/api/v1/maze/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
