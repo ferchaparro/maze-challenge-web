@@ -36,11 +36,6 @@ export class MazeConfig {
                     this.maze[index1][index2] = parseInt(strArray4[index1 * this.mazeWidth + index2]);
                 }
             }
-            console.log('Maze loaded:', this.maze);
-            console.log('Maze width:', this.mazeWidth);
-            console.log('Maze height:', this.mazeHeight);
-            console.log('Initial position:', this.initX, this.initY);
-            console.log('Goal position:', this.goalX, this.goalY);
         } catch (error) {
           console.error('Error loading file:', error);
         }

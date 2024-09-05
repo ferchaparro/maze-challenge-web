@@ -8,10 +8,21 @@ import { MovementDirection } from './core/movement-direction.enum';
 import { SpeedEnum } from './core/speed.enum';
 import { SendSolution } from './model/send-solution.model';
 import { Confeti } from './core/confeti';
+import { MazeScore, TotalScore } from './core/types';
 
 const editor = new EditorView({
   doc: `async function solveMaze(game, MovementDirection) {
   // Aqui va tu codigo... recuerdas el codigo konami?
+  await game.move(MovementDirection.WEST)
+  await game.move(MovementDirection.NORTH)
+  await game.move(MovementDirection.EAST)
+  await game.move(MovementDirection.NORTH)
+  await game.move(MovementDirection.WEST)
+  await game.move(MovementDirection.WEST)
+  await game.move(MovementDirection.WEST)
+  await game.move(MovementDirection.SOUTH)
+  await game.move(MovementDirection.SOUTH)
+  await game.move(MovementDirection.WEST)
   await game.move(MovementDirection.NORTH)
   await game.move(MovementDirection.NORTH)
   await game.move(MovementDirection.NORTH)
@@ -30,7 +41,7 @@ const editor = new EditorView({
   parent: document.getElementById('codeEditor')!
 });
 
-let isDone = false;
+let done = false;
 let canvas: HTMLCanvasElement;
 
 const btnPlay = document.getElementById('btnPlay')!;
@@ -48,8 +59,46 @@ const setMovements = (step: number) => {
 const onMove = (step: number) => {
   setMovements(step);
 }
-const onEndGame = (solved: boolean) => {
-  if (isDone) return;
+
+let mazesScore: MazeScore[] = [];
+const totalScoreRecord: TotalScore = {} as TotalScore;
+const onEndGameCalculateSocre = (maze: string, solved: boolean, steps: number, allMazesCount: number) => {
+  if (done) return;
+  btnPlay.removeAttribute('disabled');
+  btnSubmit.removeAttribute('disabled');
+  const newCanvas = document.createElement('canvas');
+  
+  newCanvas.id = 'gameCanvas';
+  
+  // Reemplazar el viejo canvas
+  canvas.parentNode?.replaceChild(newCanvas, canvas);
+  setMovements(0);
+  const mazeScore = {
+    maze,
+    solved,
+    steps,
+    score: solved ? (1000-steps) : 0
+  }
+
+  if(mazesScore.findIndex(m => m.maze === maze)<0) {
+    mazesScore.push(mazeScore);
+    if(mazesScore.length === allMazesCount) {
+      const solveAll = mazesScore.filter(m => m.solved).length === allMazesCount;
+      const totalScore = mazesScore.reduce((acc, score) => acc + score.score, 0) + (solveAll ? 1000 : 0);
+      totalScoreRecord.mazes = mazesScore;
+      totalScoreRecord.totalScore = totalScore;
+      totalScoreRecord.playerId = 1;
+      console.log(totalScoreRecord);
+      if(confirm(`Puntuacion: ${totalScore}, Enviar solucion?`)) {
+
+      }
+    }
+  }
+  
+};
+
+const onEndGame = (solved: boolean, _steps: number) => {
+  if (done) return;
   btnPlay.removeAttribute('disabled');
   btnSubmit.removeAttribute('disabled');
   const newCanvas = document.createElement('canvas');
@@ -60,7 +109,7 @@ const onEndGame = (solved: boolean) => {
   canvas.parentNode?.replaceChild(newCanvas, canvas);
   
   if(solved){
-    isDone = true;
+    done = true;
     alert('Maze solved!');
     confeti.createConfetiExplosion();
   } else {
@@ -68,6 +117,7 @@ const onEndGame = (solved: boolean) => {
   }
   setMovements(0);
 };
+
 
 const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 let konamiIndex = 0;
@@ -78,10 +128,10 @@ document.addEventListener('keydown', (event) => {
         konamiIndex++;
         if (konamiIndex === konamiCode.length) {
             triggerKonamiCode();
-            konamiIndex = 0; // Reiniciar para permitir múltiples usos
+            konamiIndex = 0;
         }
     } else {
-        konamiIndex = 0; // Reiniciar si la tecla no coincide
+        konamiIndex = 0;
     }
 });
 
@@ -89,9 +139,8 @@ function triggerKonamiCode() {
     if(!codeActive) {
       alert("¡Desbloqueaste algo!");
       confeti.createConfetiExplosion();
-      cbMaze.appendChild(new Option('Bonus 1', 'extra01'));
-      cbMaze.appendChild(new Option('Bonus 2', 'extra02'));
-      cbMaze.appendChild(new Option('Bonus 3', 'extra03'));
+      cbMaze.appendChild(new Option('Bonus 1', 'Extra01'));
+      cbMaze.appendChild(new Option('Bonus 2', 'Extra02'));
       codeActive = true;
     } else {
         alert("¡Ya lo usaste!, pero toma mas confeti");
@@ -100,8 +149,8 @@ function triggerKonamiCode() {
 }
 
 const onClickPlay = async () => {
-  isDone = false;
-  const userFunction = new Function('game', 'MovementDirection', 'onEndGame', `${editor.state.doc.toString()}
+  done = false;
+  const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
   solveMaze(game, MovementDirection)`);
 
   canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
@@ -112,11 +161,12 @@ const onClickPlay = async () => {
   btnPlay.setAttribute('disabled', 'true');
   btnSubmit.setAttribute('disabled', 'true');
   await game.start();
-  const {move, watchLocation, isDone} = game
-  userFunction({move, watchLocation, isDone} as Maze, MovementDirection, onEndGame);
+  userFunction(game, MovementDirection);
 };
 
 const onClickSubmit = async () => {
+  calculateScore();
+  return
   const solution: SendSolution = {
     solution: editor.state.doc.toString(),
     employeeId: 1,
@@ -144,6 +194,31 @@ const onClickSubmit = async () => {
   }).then(response => response.json())
   console.log(res);
 };
+
+const shuffleArray = (array: string[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1)); // índice aleatorio entre 0 e i
+    [array[i], array[j]] = [array[j], array[i]]; // intercambiar los elementos
+  }
+  return array;
+}
+
+const calculateScore = async () => {
+  mazesScore = []
+  const mazes = shuffleArray(shuffleArray(shuffleArray(['Test01', 'Test02', 'Test03', 'Test04', 'Test05', 'Extra01', 'Extra02'])));//, 'Extra03'])));
+  mazes.map(async (maze) => {
+    done=false;
+    canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
+    const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const game = MazeInitializer.initialize(`${maze}.lab`, canvas, ctx, ()=>null, 
+    (solved: boolean, steps: number) => onEndGameCalculateSocre(maze, solved, steps, mazes.length), SpeedEnum.INSTANTLY);
+    await game.start();
+    const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
+    solveMaze(game, MovementDirection)`);
+    userFunction(game, MovementDirection);
+  })
+}
 
 
 btnPlay.addEventListener('click', onClickPlay);
