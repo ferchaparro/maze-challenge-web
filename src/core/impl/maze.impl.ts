@@ -135,7 +135,7 @@ export class MazeImpl implements Maze, MazeInfo {
             return -1;
         }
         this._maze = new MazeConfig(this._file);
-        await this._maze.load();
+        await Sleeper.sleep(200)
         this._screen = new MazeScreen(this, this.canvas, this.ctx);
         this._x = this._maze!.iX();
         this._y = this._maze!.iY();
