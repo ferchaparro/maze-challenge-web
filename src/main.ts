@@ -113,7 +113,7 @@ const onClickPlay = async () => {
   btnSubmit.setAttribute('disabled', 'true');
   await game.start();
   const {move, watchLocation, isDone} = game
-  userFunction({move, watchLocation, isDone}, MovementDirection, onEndGame);
+  userFunction({move, watchLocation, isDone} as Maze, MovementDirection, onEndGame);
 };
 
 const onClickSubmit = async () => {
