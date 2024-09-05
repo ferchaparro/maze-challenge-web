@@ -9,11 +9,10 @@ export class MazeConfig {
     private goalY: number = 0;
     private maze: number[][] | null = null;
 
-    constructor(private fileConfig: string) {}
-
-    async load(){
-        await this.loadConfig(this.fileConfig);
+    constructor(private fileConfig: string) {
+        this.loadConfig(this.fileConfig);
     }
+
     async loadConfig( fileConfig: string) {
         try {
             const fileLoaded = await fetch(`/mazes/${fileConfig}`).then(res => res.text());
