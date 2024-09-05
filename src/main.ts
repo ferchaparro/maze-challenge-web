@@ -112,7 +112,8 @@ const onClickPlay = async () => {
   btnPlay.setAttribute('disabled', 'true');
   btnSubmit.setAttribute('disabled', 'true');
   await game.start();
-  userFunction(game, MovementDirection, onEndGame);
+  const {move, watchLocation, isDone} = game
+  userFunction({move, watchLocation, isDone}, MovementDirection, onEndGame);
 };
 
 const onClickSubmit = async () => {
