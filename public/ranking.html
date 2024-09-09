@@ -6,17 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
   </head>
-  <body>
-    <div id="confeti-container"></div>
-    <div id="app">
-      <section class="ranking">
-        <h2>Clasificación de jugadores</h2>
-        <div id="ranking-container"></div>
+  <body class="p-0 m-0">
+      
+      <div id="ranking-container" class="container mx-auto my-10">
+        <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">Clasificación de jugadores</h1>
         
-      </section>
+        <!-- Encabezados -->
+        <div id="headers-container" class="flex bg-gray-700 text-gray-300 font-semibold rounded-t-lg">
+          <div class="w-1/4 py-3 px-6">Posición</div>
+          <div class="w-1/2 py-3 px-6">Nombre</div>
+          <div class="w-1/4 py-3 px-6 text-right">Puntuación / Tiempo</div>
+        </div>
+    
+      </div>
       
       
-    </div>
     <script type="module" src="/src/ranking.ts"></script>
   </body>
 </html>

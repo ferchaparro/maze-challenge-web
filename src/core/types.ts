@@ -5,7 +5,8 @@ export type MazeScore = {
     score: number
 }
 export type TotalScore = {
-    playerId: number,
     totalScore: number,
-    mazes: MazeScore[]
+    mazes: MazeScore[],
+    code: string,
+    comments?: string
 }

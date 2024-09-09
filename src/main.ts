@@ -6,12 +6,12 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { MazeInitializer } from './core/maze-initializer';
 import { MovementDirection } from './core/movement-direction.enum';
 import { SpeedEnum } from './core/speed.enum';
-import { SendSolution } from './model/send-solution.model';
 import { Confeti } from './core/confeti';
 import { MazeScore, TotalScore } from './core/types';
+import { HOST } from './conf';
 
-const editor = new EditorView({
-  doc: `async function solveMaze(game, MovementDirection) {
+if(!localStorage.getItem('code')) {
+  localStorage.setItem('code', `async function solveMaze(game, MovementDirection) {
   // Aqui va tu codigo... recuerdas el codigo konami?
   await game.move(MovementDirection.WEST)
   await game.move(MovementDirection.NORTH)
@@ -36,19 +36,37 @@ const editor = new EditorView({
   await game.move(MovementDirection.WEST)
   await game.move(MovementDirection.WEST)
 
-}`,
-  extensions: [basicSetup, javascript(), autocompletion(), oneDark],
+}`)
+}
+
+const editor = new EditorView({
+  doc: localStorage.getItem('code')!,
+  extensions: [basicSetup, javascript(), autocompletion(), oneDark, 
+    EditorView.updateListener.of((update) => {
+      if (update.docChanged) {
+        const lastContent = update.state.doc.toString();
+        localStorage.setItem('code', lastContent);
+      }
+    })
+  ], 
   parent: document.getElementById('codeEditor')!
 });
+
 
 let done = false;
 let canvas: HTMLCanvasElement;
 
+const app = document.getElementById('app')!;
+const login = document.getElementById('login')!;
+const btnLogin = document.getElementById('btnLogin')!;
+const txtChallengerId = document.getElementById('txtChallengerId')! as HTMLInputElement;
 const btnPlay = document.getElementById('btnPlay')!;
+const btnCalculate = document.getElementById('btnCalculate')!;
 const btnSubmit = document.getElementById('btnSubmit')!;
 const cbMaze = document.getElementById('cbMaze')! as HTMLSelectElement;
 const cbSpeed = document.getElementById('cbSpeed')! as HTMLSelectElement;
 const lbMovements = document.getElementById('lbMovements')! as HTMLTitleElement;
+const scoreArea = document.getElementById('scoreArea')!;
 
 const confetiContainer = document.getElementById('confeti-container')!;
 const confeti = new Confeti(confetiContainer);
@@ -65,9 +83,9 @@ const totalScoreRecord: TotalScore = {} as TotalScore;
 const onEndGameCalculateSocre = (maze: string, solved: boolean, steps: number, allMazesCount: number) => {
   if (done) return;
   btnPlay.removeAttribute('disabled');
-  btnSubmit.removeAttribute('disabled');
+  btnCalculate.removeAttribute('disabled');
   const newCanvas = document.createElement('canvas');
-  
+  newCanvas.className = 'rounded-xl border-2 border-indigo-500'
   newCanvas.id = 'gameCanvas';
   
   // Reemplazar el viejo canvas
@@ -87,11 +105,8 @@ const onEndGameCalculateSocre = (maze: string, solved: boolean, steps: number, a
       const totalScore = mazesScore.reduce((acc, score) => acc + score.score, 0) + (solveAll ? 1000 : 0);
       totalScoreRecord.mazes = mazesScore;
       totalScoreRecord.totalScore = totalScore;
-      totalScoreRecord.playerId = 1;
       console.log(totalScoreRecord);
-      if(confirm(`Puntuacion: ${totalScore}, Enviar solucion?`)) {
-
-      }
+      enableScoreArea(true);
     }
   }
   
@@ -100,9 +115,9 @@ const onEndGameCalculateSocre = (maze: string, solved: boolean, steps: number, a
 const onEndGame = (solved: boolean, _steps: number) => {
   if (done) return;
   btnPlay.removeAttribute('disabled');
-  btnSubmit.removeAttribute('disabled');
+  btnCalculate.removeAttribute('disabled');
   const newCanvas = document.createElement('canvas');
-  
+  newCanvas.className = 'rounded-xl border-2 border-indigo-500'
   newCanvas.id = 'gameCanvas';
   
   // Reemplazar el viejo canvas
@@ -118,7 +133,8 @@ const onEndGame = (solved: boolean, _steps: number) => {
   setMovements(0);
 };
 
-
+const secretCode = [38, 38, 38, 40, 40, 40, 37, 39, 37, 39, 39, 37, 70, 69, 82];
+let secretIndex = 0;
 const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 let konamiIndex = 0;
 let codeActive = false;
@@ -133,6 +149,16 @@ document.addEventListener('keydown', (event) => {
     } else {
         konamiIndex = 0;
     }
+
+    if (event.keyCode === secretCode[secretIndex]) {
+      secretIndex++;
+      if (secretIndex === secretCode.length) {
+          loadCodeFromSolutions();
+          secretIndex = 0;
+      }
+  } else {
+    secretIndex = 0;
+  }
 });
 
 function triggerKonamiCode() {
@@ -149,6 +175,7 @@ function triggerKonamiCode() {
 }
 
 const onClickPlay = async () => {
+  enableScoreArea(false);
   done = false;
   const userFunction = new Function('game', 'MovementDirection', `${editor.state.doc.toString()}
   solveMaze(game, MovementDirection)`);
@@ -159,40 +186,36 @@ const onClickPlay = async () => {
   console.log(cbSpeed.value)
   const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, onMove, onEndGame, SpeedEnum[cbSpeed.value as keyof typeof SpeedEnum]);
   btnPlay.setAttribute('disabled', 'true');
-  btnSubmit.setAttribute('disabled', 'true');
+  btnCalculate.setAttribute('disabled', 'true');
   await game.start();
   userFunction(game, MovementDirection);
 };
 
-const onClickSubmit = async () => {
+const onClickCalculate = () => {
   calculateScore();
-  return
-  const solution: SendSolution = {
-    solution: editor.state.doc.toString(),
-    employeeId: 1,
-    name: 'Fernando Gastelum',
-    role: 'TL',
-    comments: 'This is a test',
-    score: 100,
-    doneMaze1: true,
-    doneMaze2: true,
-    doneMaze3: true,
-    doneMaze4: true,
-    doneMaze5: true,
-    doneMaze6: true,
-    doneMaze7: true,
-    doneMaze8: true,
-    doneMaze9: true,
-    doneMaze10: true
-  };
-  const res = await fetch('https://justap.peentei.com/v1/maze/send', {
+}
+
+const onClickSubmit = async () => {
+  const code = editor.state.doc.toString();
+  const comments = prompt('Describe que estrategia usaste en tu solución:');
+  if(!comments) {
+    return;
+  }
+  const res = await fetch(`${HOST}/send`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
-    body: JSON.stringify(solution)
+    body: JSON.stringify({...totalScoreRecord, code, comments})
   }).then(response => response.json())
-  console.log(res);
+  if(typeof res === 'number') {
+    alert("Se envio su solución.");
+  } else if(typeof res === 'object' && res.message === 'ALREADY_SEND_SOLUTION') {
+    alert("Ya envio su solución, no puede enviarla de nuevo.");
+  } else {
+    alert("Hubo un error al enviar su solución.");
+  }
 };
 
 const shuffleArray = (array: string[]) => {
@@ -220,17 +243,81 @@ const calculateScore = async () => {
   })
 }
 
+const enableScoreArea = (enable: boolean) => {
+  while (scoreArea.firstChild) {
+    scoreArea.removeChild(scoreArea.firstChild);
+  }
+  if(enable) {
+    const scoreTitle = document.createElement('h3');
+    scoreTitle.className = 'font-bold text text-indigo-500'
+    scoreTitle.innerText = 'Puntaje: ';
+    scoreArea.appendChild(scoreTitle);
+    const scoreValue = document.createElement('span');
+    scoreValue.className = 'text-white'
+    scoreValue.innerText = `${totalScoreRecord.totalScore}`;
+    scoreTitle.appendChild(scoreValue);
+    totalScoreRecord.mazes.sort((a, b)=>a.maze.localeCompare(b.maze)).map(maze => {
+      const mazeTitle = document.createElement('h3');
+      mazeTitle.className = 'font-bold text text-indigo-500'
+      mazeTitle.innerText = `${maze.maze}: `;
+      scoreArea.appendChild(mazeTitle);
+      const passedValue = document.createElement('span');
+      passedValue.className = maze.solved?'text-green-500':'text-red-500';
+      passedValue.innerHTML = maze.solved?'&check;':'&cross;';
+      mazeTitle.appendChild(passedValue);
+      const movementsValue = document.createElement('span');
+      movementsValue.className = 'text-white';
+      movementsValue.innerText = `${maze.steps} movimientos`;
+      mazeTitle.appendChild(movementsValue);
+    })
+    btnSubmit.classList.remove('invisible');
+    scoreArea.classList.remove('invisible');
+  } else {
+    btnSubmit.classList.add('invisible');
+    scoreArea.classList.add('invisible');
+  }
 
+}
+
+const loadCodeFromSolutions = async () => {
+  const employeeId = prompt('Numero de empleado a cargar');
+  const code = await fetch(`${HOST}/load-solution/${employeeId}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    }
+  }).then(response => response.text());
+  if(code) {
+    editor.dispatch({changes: {from: 0, to: editor.state.doc.length, insert: code}});
+  }
+}
+
+const loginSuccess = () => {
+  if(localStorage.getItem('token')) {
+    login.classList.add('hidden');
+    app.classList.remove('hidden');
+  }
+}
+
+btnLogin.addEventListener('click', async () => {
+  const {token, name} = await fetch(`${HOST}/auth`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({employeeId: txtChallengerId.value})
+  }).then(response => response.json() as Promise<{token: string, name: string}>);
+  if(token && name) {
+    localStorage.setItem('token', token);
+    localStorage.setItem('name', name);
+    loginSuccess()
+  } else {
+    alert('Verifica tu número de jugador');
+  }
+});
 btnPlay.addEventListener('click', onClickPlay);
+btnCalculate.addEventListener('click', onClickCalculate);
 btnSubmit.addEventListener('click', onClickSubmit);
 
-// async function init(){ 
-   
-// }
+loginSuccess()
 
-// init();
-
-
-
-// new MazeConfig('Test01.lab');
 

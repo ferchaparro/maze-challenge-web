@@ -8,21 +8,28 @@
   </head>
   <body>
     <div id="confeti-container"></div>
-    <div id="app">
+    <div id="login" class="w-screen h-screen grid place-content-center">
+      <div class="flex flex-col gap-3">
+        <h1 class="text-3xl">Laberinto</h1>
+        <input type="text" id="txtChallengerId" class="rounded-lg border-2 border-indigo-500 p-2 w-72" placeholder="Inicia con tu numero de empleado" />
+        <button type="button" id="btnLogin">Iniciar</button>
+      </div>
+    </div>
+    <div id="app" class="grid hidden">
       <section class="code-section">
         <div id="codeEditor"></div>
         <div class="tool-bar">
           <button type="button" id="btnPlay">Play</button>
-          <button type="button" id="btnSubmit">Enviar</button>
+          <button type="button" id="btnCalculate">Calcular</button>
         </div>
       </section>
-      <section class="maze-section">
+      <section class="maze-section p-4 flex flex-col gap-3 justify-start items-center flex-grow">
         <div class="tool-bar">
-          <select id="cbSpeed">
-            <option value="SLOW">Lento</option>
+          <select id="cbSpeed" class="forced-colors:appearance-auto border row-start-1 col-start-1 rounded-lg bg-slate-50 dark:bg-slate-800 hover:border-indigo-500 hover:bg-slate-700 border-slate-600 text-slate-200 px-2">
             <option value="FAST">R&aacute;pido</option>
+            <option value="SLOW">Lento</option>
           </select>
-          <select id="cbMaze">
+          <select id="cbMaze" class="forced-colors:appearance-auto border row-start-1 col-start-1 rounded-lg bg-slate-50 dark:bg-slate-800 hover:border-indigo-500 hover:bg-slate-700 border-slate-600 text-slate-200 px-2">
             <option value="Test01">Laberinto 1</option>
             <option value="Test02">Laberinto 2</option>
             <option value="Test03">Laberinto 3</option>
@@ -30,8 +37,12 @@
             <option value="Test05">Laberinto 5</option>
           </select>
         </div>
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="gameCanvas" class="rounded-xl border-2 border-indigo-500"></canvas>
         <h3 id="lbMovements">Movimientos: 0</h3>
+        <div id="scoreArea" class="p-4 rounded-xl border-2 border-indigo-500 h-auto w-72 invisible"></div>
+        <div class="tool-bar">
+          <button type="button" id="btnSubmit" class="invisible">Enviar</button>
+        </div>
       </section>
       
     </div>
