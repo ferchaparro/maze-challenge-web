@@ -52,7 +52,6 @@ const editor = new EditorView({
   parent: document.getElementById('codeEditor')!
 });
 
-
 let done = false;
 let canvas: HTMLCanvasElement;
 
@@ -105,7 +104,6 @@ const onEndGameCalculateSocre = (maze: string, solved: boolean, steps: number, a
       const totalScore = mazesScore.reduce((acc, score) => acc + score.score, 0) + (solveAll ? 1000 : 0);
       totalScoreRecord.mazes = mazesScore;
       totalScoreRecord.totalScore = totalScore;
-      console.log(totalScoreRecord);
       enableScoreArea(true);
     }
   }
@@ -183,7 +181,6 @@ const onClickPlay = async () => {
   canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;
   const ctx: CanvasRenderingContext2D = canvas.getContext('2d')!;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  console.log(cbSpeed.value)
   const game = MazeInitializer.initialize(`${cbMaze.value}.lab`, canvas, ctx, onMove, onEndGame, SpeedEnum[cbSpeed.value as keyof typeof SpeedEnum]);
   btnPlay.setAttribute('disabled', 'true');
   btnCalculate.setAttribute('disabled', 'true');
@@ -228,7 +225,7 @@ const shuffleArray = (array: string[]) => {
 
 const calculateScore = async () => {
   mazesScore = []
-  const mazes = shuffleArray(shuffleArray(shuffleArray(['Test01', 'Test02', 'Test03', 'Test04', 'Test05', 'Extra01', 'Extra02'])));//, 'Extra03'])));
+  const mazes = shuffleArray(shuffleArray(shuffleArray(['Test01', 'Test02', 'Test03', 'Test04', 'Test05', 'Extra01', 'Extra02'])));
   mazes.map(async (maze) => {
     done=false;
     canvas = document.getElementById('gameCanvas')! as HTMLCanvasElement;

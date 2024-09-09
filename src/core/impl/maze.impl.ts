@@ -42,10 +42,8 @@ export class MazeImpl implements Maze, MazeInfo {
     private refresh = async (_x: number) => {
         await Sleeper.sleep(this._speed)
         
-        // const m: number = ++this._movements;
         if(this.started) {
             this._screen!.drawMaze(this._maze!);
-            // this.moveListener(m);
             if (this._movements >= this._max) {
                 await Sleeper.sleep(this._speed)
                 this.endListener(false, this._movements);
@@ -53,7 +51,6 @@ export class MazeImpl implements Maze, MazeInfo {
                 if (this._timer != null) {
                     this._timer.stop();
                 }
-                this._screen?.printMaxMovementsMessage();
                 this._timer = null;
             }
         } 
@@ -88,8 +85,6 @@ export class MazeImpl implements Maze, MazeInfo {
         this.refresh(0);
         await Sleeper.sleep(this._speed)
         
-        // this._screen.printPosition();
-        
         this._timer = new Stopwatch();
         this._timer.start();
         this.keepAlive();
@@ -114,9 +109,9 @@ export class MazeImpl implements Maze, MazeInfo {
             await Sleeper.sleep(this._speed)
             return -1;
         }
-        // this._screen?.deletePosition();
+       
         const m: number = ++this._movements;
-        // const t: number = (this._timer?.getElapsedTime()??0)/1000;
+        
         switch (dir)
         {
         case MovementDirection.SOUTH:
@@ -132,14 +127,11 @@ export class MazeImpl implements Maze, MazeInfo {
             --this._y;
             break;
         }
-        // this.writeMovement(this._movements, this._x, this._y);
+        
         await Sleeper.sleep(this._speed);
         this._screen?.printPosition();
-        // if(this.moveListener){
-            this.moveListener(m);
-        // }
+        this.moveListener(m);
         
-        // Thread.Sleep(this._speed);
         if (this.isDone())
         {
             await Sleeper.sleep(10);
@@ -151,27 +143,12 @@ export class MazeImpl implements Maze, MazeInfo {
                 this.endListener(true, this._movements);
                 this.started = false;
             }
-            this._screen?.printSuccessMessage();
-            // new Thread((ThreadStart) (() => this.writeResult(m, t))).Start();
             this._timer = null;
             return 15;
         }
         if (this._movements < this._max) {
             return this._maze!.loc(this._x, this._y);
         }
-        // this._x = this._maze!.fX();
-        // this._y = this._maze!.fY();
-        // if (this._timer != null) {
-        //     this._timer.stop();
-        // }
-        // // if(this.endListener){
-        // //     this.endListener(false);
-        // //     this.started = false;
-        // // }
-        // this._screen?.printMaxMovementsMessage();
-      
-        // // new Thread((ThreadStart) (() => this.writeResult(m, t))).Start();
-        // this._timer = null;
         return 15;
     }
 

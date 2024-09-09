@@ -35,11 +35,9 @@ export class Stopwatch {
     }
   }
   
-  // Ejemplo de uso:
   const sw = new Stopwatch();
   sw.start();
   
   setTimeout(() => {
     sw.stop();
-    console.log(`Tiempo transcurrido: ${sw.getElapsedTime()} ms`);
   }, 2000);

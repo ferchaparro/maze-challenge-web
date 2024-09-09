@@ -1,8 +1,6 @@
 import './style.css'
 import { HOST } from './conf';
 
-// import { MazeScore, TotalScore } from './core/types';
-
 const rankingContainer: HTMLElement = document.getElementById('ranking-container')!;
 const headersContainer: HTMLElement = document.getElementById('headers-container')!;
 
