@@ -9,11 +9,11 @@
   <body>
     <div id="confeti-container"></div>
     <div id="login" class="w-screen h-screen grid place-content-center">
-      <div class="flex flex-col gap-3">
-        <h1 class="text-3xl">Laberinto</h1>
-        <input type="text" id="txtChallengerId" class="rounded-lg border-2 border-indigo-500 p-2 w-72" placeholder="Inicia con tu numero de empleado" />
-        <button type="button" id="btnLogin">Iniciar</button>
-      </div>
+      <form id="frmLogin" class="flex flex-col gap-3">
+        <h1 class="text-3xl">El Laberinto</h1>
+        <input type="text" id="txtChallengerId" required class="rounded-lg border-2 border-indigo-500 p-2 w-72" placeholder="Inicia con tu numero de empleado" />
+        <button>Iniciar</button>
+      </form>
     </div>
     <div id="app" class="grid hidden">
       <section class="code-section">

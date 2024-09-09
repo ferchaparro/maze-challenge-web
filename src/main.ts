@@ -58,7 +58,6 @@ let canvas: HTMLCanvasElement;
 
 const app = document.getElementById('app')!;
 const login = document.getElementById('login')!;
-const btnLogin = document.getElementById('btnLogin')!;
 const txtChallengerId = document.getElementById('txtChallengerId')! as HTMLInputElement;
 const btnPlay = document.getElementById('btnPlay')!;
 const btnCalculate = document.getElementById('btnCalculate')!;
@@ -67,6 +66,7 @@ const cbMaze = document.getElementById('cbMaze')! as HTMLSelectElement;
 const cbSpeed = document.getElementById('cbSpeed')! as HTMLSelectElement;
 const lbMovements = document.getElementById('lbMovements')! as HTMLTitleElement;
 const scoreArea = document.getElementById('scoreArea')!;
+const frmLogin = document.getElementById('frmLogin')! as HTMLFormElement;
 
 const confetiContainer = document.getElementById('confeti-container')!;
 const confeti = new Confeti(confetiContainer);
@@ -298,7 +298,8 @@ const loginSuccess = () => {
   }
 }
 
-btnLogin.addEventListener('click', async () => {
+frmLogin.addEventListener('submit', async (event) => {
+  event.preventDefault();
   const {token, name} = await fetch(`${HOST}/auth`, {
     method: 'POST',
     headers: {
