@@ -7,7 +7,7 @@ const rankingContainer: HTMLElement = document.getElementById('ranking-container
 const headersContainer: HTMLElement = document.getElementById('headers-container')!;
 
 const {exposeScores, exposeSolutions, ranking, totalChallengers} = await fetch(`${HOST}/ranking`).then(res => res.json());
-console.log(exposeScores, exposeSolutions, ranking, totalChallengers);
+console.log('Todos los jugadores: ', totalChallengers);
 
 if (exposeScores) {
     const scoreHeader = document.createElement('div');
