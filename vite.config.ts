@@ -8,7 +8,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: 'index.html',
-        ranking: 'src/ranking.html',
+        ranking: 'ranking.html',
       }
     }
   }
