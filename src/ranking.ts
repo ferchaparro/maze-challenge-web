@@ -31,7 +31,7 @@ ranking.forEach((totalScore: any, index: number) => {
     newDiv.appendChild(placeNumber);
     const name = document.createElement('div');
     name.className = 'w-1/2 py-3 px-6';
-    name.innerHTML = `${totalScore.name}`;
+    name.innerHTML = `${totalScore.playerId} - ${totalScore.name}`;
     newDiv.appendChild(name);
     const score = document.createElement('div');
     score.className = 'w-1/4 py-3 px-6 text-right';

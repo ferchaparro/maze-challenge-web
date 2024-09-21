@@ -66,6 +66,22 @@ const cbSpeed = document.getElementById('cbSpeed')! as HTMLSelectElement;
 const lbMovements = document.getElementById('lbMovements')! as HTMLTitleElement;
 const scoreArea = document.getElementById('scoreArea')!;
 const frmLogin = document.getElementById('frmLogin')! as HTMLFormElement;
+const frmCreateAccount = document.getElementById('frmCreateAccount')! as HTMLFormElement;
+
+//crea la funcionalidad para que se muestre la ventana flotante al darle click a crear cuenta
+const btnCreateAccount = document.getElementById('btnCreateAccount')!;
+const btnClose = document.getElementById('btnCloseCreateAccount')!;
+const modal = document.getElementById('createAccount')!;
+
+btnCreateAccount.addEventListener('click', () => {
+  modal.classList.remove('invisible');
+});
+
+btnClose.addEventListener('click', () => {
+  modal.classList.add('invisible');
+});
+
+
 
 const confetiContainer = document.getElementById('confeti-container')!;
 const confeti = new Confeti(confetiContainer);
@@ -310,6 +326,27 @@ frmLogin.addEventListener('submit', async (event) => {
     loginSuccess()
   } else {
     alert('Verifica tu número de jugador');
+  }
+});
+
+frmCreateAccount.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const {employeeId} = await fetch(`${HOST}/create-challenger`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      employeeId: txtChallengerId.value, 
+      name: (document.getElementById('txtName') as HTMLInputElement).value,
+      password: (document.getElementById('txtPassword') as HTMLInputElement).value
+    })
+  }).then(response => response.json());
+  if(employeeId) {
+    txtChallengerId.value = employeeId;
+    modal.classList.add('invisible');
+  } else {
+    alert('El numero de participante ya existe.');
   }
 });
 btnPlay.addEventListener('click', onClickPlay);
