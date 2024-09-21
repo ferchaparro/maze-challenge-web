@@ -18,7 +18,6 @@
       <div class="flex justify-center mt-4">
         <a href="#" id="btnCreateAccount" class="text-indigo-500">Crear cuenta</a>
       </div>
-      <!-- crea una ventana flotante con tailwind que aparezca al darle click al btnCreateAccount-->
       <div id="createAccount" class="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 grid place-content-center invisible">
         <form id="frmCreateAccount" class="flex flex-col gap-3 bg-slate-800 p-6 rounded-lg text-slate-200 w-96">
           <h1 class="text-3xl">Crear cuenta</h1>
@@ -32,6 +31,7 @@
           </div>
         </form>
       </div>
+    </div>
     <div id="app" class="grid hidden">
       <section class="code-section">
         <div id="codeEditor"></div>
@@ -60,8 +60,11 @@
         <div class="tool-bar">
           <button type="button" id="btnSubmit" class="invisible">Enviar</button>
         </div>
-      </section>
-      
+        <div id="footer" class="p-4 flex flex-col gap-2"></div>
+          <a href="/ranking.html" target="_blank" class="text-indigo-500">Ver Ranking</a>
+          <a href="/maze-challenge.pdf" target="_blank" class="text-indigo-500">Descargar instrucciones</a>
+        </div>
+      </section> 
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

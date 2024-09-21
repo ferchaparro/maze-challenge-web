@@ -337,9 +337,9 @@ frmCreateAccount.addEventListener('submit', async (event) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      employeeId: txtChallengerId.value, 
-      name: (document.getElementById('txtName') as HTMLInputElement).value,
-      password: (document.getElementById('txtPassword') as HTMLInputElement).value
+      employeeId: (document.getElementById('txtChallengerIdCA') as HTMLInputElement).value,
+      name: (document.getElementById('txtNameCA') as HTMLInputElement).value,
+      password: (document.getElementById('txtPasswordCA') as HTMLInputElement).value
     })
   }).then(response => response.json());
   if(employeeId) {
