@@ -58,6 +58,7 @@ let canvas: HTMLCanvasElement;
 const app = document.getElementById('app')!;
 const login = document.getElementById('login')!;
 const txtChallengerId = document.getElementById('txtChallengerId')! as HTMLInputElement;
+const txtPassword = document.getElementById('txtPassword')! as HTMLInputElement;
 const btnPlay = document.getElementById('btnPlay')!;
 const btnCalculate = document.getElementById('btnCalculate')!;
 const btnSubmit = document.getElementById('btnSubmit')!;
@@ -74,6 +75,7 @@ const btnClose = document.getElementById('btnCloseCreateAccount')!;
 const modal = document.getElementById('createAccount')!;
 
 btnCreateAccount.addEventListener('click', () => {
+  frmCreateAccount.reset();
   modal.classList.remove('invisible');
 });
 
@@ -318,7 +320,7 @@ frmLogin.addEventListener('submit', async (event) => {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({employeeId: txtChallengerId.value})
+    body: JSON.stringify({employeeId: txtChallengerId.value, password: txtPassword.value})
   }).then(response => response.json() as Promise<{token: string, name: string}>);
   if(token && name) {
     localStorage.setItem('token', token);
@@ -337,13 +339,14 @@ frmCreateAccount.addEventListener('submit', async (event) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      employeeId: (document.getElementById('txtChallengerIdCA') as HTMLInputElement).value,
+      employeeId: parseInt((document.getElementById('txtChallengerIdCA') as HTMLInputElement).value),
       name: (document.getElementById('txtNameCA') as HTMLInputElement).value,
       password: (document.getElementById('txtPasswordCA') as HTMLInputElement).value
     })
   }).then(response => response.json());
   if(employeeId) {
     txtChallengerId.value = employeeId;
+    txtPassword.focus();
     modal.classList.add('invisible');
   } else {
     alert('El numero de participante ya existe.');
