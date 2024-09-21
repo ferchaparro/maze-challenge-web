@@ -35,7 +35,15 @@ ranking.forEach((totalScore: any, index: number) => {
     newDiv.appendChild(name);
     const score = document.createElement('div');
     score.className = 'w-1/4 py-3 px-6 text-right';
-    score.innerHTML = `${exposeScores?totalScore.totalScore: '???'} / ${(totalScore.elapsedTime/60).toFixed(2)}m`;
+    var finishTime = new Date(totalScore.finishedAt).toLocaleString('es-MX', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    }).replace(',', '');
+    score.innerHTML = `${exposeScores?totalScore.totalScore: '???'} / ${(totalScore.elapsedTime/60).toFixed(2)}m<br>${finishTime}`;
     newDiv.appendChild(score);
     rankingContainer.appendChild(newDiv);
     if(exposeScores) {
